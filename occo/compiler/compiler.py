@@ -42,6 +42,8 @@ class StaticDescription(object):
         self.infra_id = str(uuid.uuid4())
         self.name = desc['name']
         self.topological_order = StaticDescription.topo_order(desc)
+        self.nodes = desc['nodes']
+        self.dependencies = desc['dependencies']
 
     @staticmethod
     def schema_check(infrastructure_description):
