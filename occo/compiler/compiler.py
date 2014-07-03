@@ -5,6 +5,7 @@
 __all__ = ['StaticDescription', 'SchemaError']
 
 import yaml
+import uuid
 
 class SchemaError(Exception):
     pass
@@ -38,6 +39,7 @@ class StaticDescription(object):
             if type(infrastructure_description) is dict \
             else yaml.load(infrastructure_description)
         StaticDescription.schema_check(desc)
+        self.infra_id = str(uuid.uuid4())
         self.name = desc['name']
         self.topological_order = StaticDescription.topo_order(desc)
 
