@@ -41,18 +41,19 @@ class StaticDescription(object):
         StaticDescription.schema_check(desc)
         self.infra_id = str(uuid.uuid4())
         self.name = desc['name']
-        self.topological_order = StaticDescription.topo_order(desc)
         self.nodes = desc['nodes']
         self.dependencies = desc['dependencies']
+        self.topological_order = \
+            StaticDescription.topo_order(self.nodes, self.dependencies)
 
     @staticmethod
     def schema_check(infrastructure_description):
         pass
 
     @staticmethod
-    def topo_order(desc):
-        nodes = desc['nodes']
-        edges = [Edge(*ends) for ends in desc['dependencies']]
+    def topo_order(all_nodes, all_dependencies):
+        nodes = all_nodes
+        edges = [Edge(*ends) for ends in all_dependencies]
         topo_order = TopologicalOrder()
         while nodes:
             dependents = [i.dependent for i in edges]
