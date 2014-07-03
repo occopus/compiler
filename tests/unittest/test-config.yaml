@@ -1,4 +1,5 @@
 infrastructure:
+    name: example-infrastructure
     nodes:
     - &A
         name: A

@@ -2,7 +2,7 @@
 # Copyright (C) 2014 MTA SZTAKI
 #
 
-__all__ = ['load', 'SchemaError']
+__all__ = ['StaticDescription', 'SchemaError']
 
 import yaml
 
@@ -32,24 +32,28 @@ class TopologicalOrder(list):
     def __str__(self):
         return '\n'.join(str(i) for i in self)
 
-def schema_check(infrastructure_description):
-    pass
+class StaticDescription(object):
+    def __init__(self, infrastructure_description):
+        desc = infrastructure_description \
+            if type(infrastructure_description) is dict \
+            else yaml.load(infrastructure_description)
+        StaticDescription.schema_check(desc)
+        self.name = desc['name']
+        self.topological_order = StaticDescription.topo_order(desc)
 
-def load(infrastructure_description):
-    desc = infrastructure_description \
-        if type(infrastructure_description) is dict \
-        else yaml.load(infrastructure_description)
-    schema_check(infrastructure_description)
+    @staticmethod
+    def schema_check(infrastructure_description):
+        pass
 
-    nodes = desc['nodes']
-    edges = [Edge(*ends) for ends in desc['dependencies']]
-    topo_order = TopologicalOrder()
-    while nodes:
-        dependents = [i.dependent for i in edges]
-        topo_level = TopoLevel([n for n in nodes if not n in dependents])
-        edges = [e for e in edges if not e.dependee in topo_level]
-        nodes = [n for n in nodes if not n in topo_level]
-        topo_order.add_level(topo_level)
-    return topo_order 
-
-    
+    @staticmethod
+    def topo_order(desc):
+        nodes = desc['nodes']
+        edges = [Edge(*ends) for ends in desc['dependencies']]
+        topo_order = TopologicalOrder()
+        while nodes:
+            dependents = [i.dependent for i in edges]
+            topo_level = TopoLevel([n for n in nodes if not n in dependents])
+            edges = [e for e in edges if not e.dependee in topo_level]
+            nodes = [n for n in nodes if not n in topo_level]
+            topo_order.add_level(topo_level)
+        return topo_order
