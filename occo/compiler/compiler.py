@@ -32,10 +32,14 @@ class TopologicalOrder(list):
     def __str__(self):
         return '\n'.join(str(i) for i in self)
 
+def schema_check(infrastructure_description):
+    pass
+
 def load(infrastructure_description):
     desc = infrastructure_description \
         if type(infrastructure_description) is dict \
         else yaml.load(infrastructure_description)
+    schema_check(infrastructure_description)
 
     nodes = desc['nodes']
     edges = [Edge(*ends) for ends in desc['dependencies']]
