@@ -4,6 +4,8 @@
 
 __all__ = ['load', 'SchemaError']
 
+import yaml
+
 class SchemaError(Exception):
     pass
 
@@ -31,7 +33,10 @@ class TopologicalOrder(list):
         return '\n'.join(str(i) for i in self)
 
 def load(infrastructure_description):
-    desc = infrastructure_description
+    desc = infrastructure_description \
+        if type(infrastructure_description) is dict \
+        else yaml.load(infrastructure_description)
+
     nodes = desc['nodes']
     edges = [Edge(*ends) for ends in desc['dependencies']]
     topo_order = TopologicalOrder()
