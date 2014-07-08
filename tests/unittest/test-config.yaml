@@ -1,5 +1,29 @@
+nodes: &NODES
+- &A
+    name: A
+    roles:
+    - X-role
+- &B
+    name: B
+    roles:
+    - Y-role
+    - Z-role
+    scaling:
+        max: 5
+- &C
+    name: C
+    roles:
+    - Q-role
+    scaling:
+        min: 2
+        max: 5
+- &D
+    name: D
+    roles:
+    - R-role
 infrastructures:
 -
+    name: diamond
     expected_output:
     - !!set
       ? A
@@ -8,30 +32,7 @@ infrastructures:
       ? B
     - !!set
       ? D
-    name: diamond
-    nodes:
-    - &A
-        name: A
-        roles:
-        - X-role
-    - &B
-        name: B
-        roles:
-        - Y-role
-        - Z-role
-        scaling:
-            max: 5
-    - &C
-        name: C
-        roles:
-        - Q-role
-        scaling:
-            min: 2
-            max: 5
-    - &D
-        name: D
-        roles:
-        - R-role
+    nodes: *NODES
     dependencies:
     - [ *D, *C ]
     - [ *D, *B ]
