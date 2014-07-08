@@ -1,5 +1,14 @@
-infrastructure:
-    name: example-infrastructure
+infrastructures:
+-
+    expected_output:
+    - !!set
+      ? A
+    - !!set
+      ? C
+      ? B
+    - !!set
+      ? D
+    name: diamond
     nodes:
     - &A
         name: A

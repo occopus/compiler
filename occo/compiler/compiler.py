@@ -25,7 +25,7 @@ class TopoLevel(list):
     def add_node(self, node):
         self.append(node)
     def __str__(self):
-        return '[%s]'%(', '.join(n['name'] for n in self))
+        return '- !!set\n%s'%('\n'.join('  ? %s'%n['name'] for n in self))
 
 class TopologicalOrder(list):
     def add_level(self, level):
