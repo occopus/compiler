@@ -78,3 +78,41 @@ infrastructures:
       ? D
     nodes: *NODES
     dependencies: {}
+-
+    name: complex
+    expected_output:
+        - !!set
+          ? A
+          ? B
+        - !!set
+          ? C
+          ? D
+          ? E
+        - !!set
+          ? F
+          ? G
+        - !!set
+          ? H
+    nodes:
+    - *A
+    - *B
+    - *C
+    - *D
+    - &E
+      name: E
+    - &F
+      name: F
+    - &G
+      name: G
+    - &H
+      name: H
+    dependencies:
+    - [ *H, *C ]
+    - [ *H, *F ]
+    - [ *F, *D ]
+    - [ *F, *E ]
+    - [ *G, *C ]
+    - [ *G, *D ]
+    - [ *E, *B ]
+    - [ *C, *A ]
+    - [ *D, *A ]
