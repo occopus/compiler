@@ -68,3 +68,13 @@ infrastructures:
     - [ *B, *A ]
     - [ *D, *A ]
     - [ *C, *A ]
+-
+    name: cloud
+    expected_output:
+    - !!set
+      ? A
+      ? B
+      ? C
+      ? D
+    nodes: *NODES
+    dependencies: {}
