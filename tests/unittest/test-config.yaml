@@ -54,3 +54,17 @@ infrastructures:
     - [ *D, *C ]
     - [ *B, *A ]
     - [ *C, *B ]
+-
+    name: singlestory
+    expected_output:
+    - !!set
+      ? A
+    - !!set
+      ? B
+      ? C
+      ? D
+    nodes: *NODES
+    dependencies:
+    - [ *B, *A ]
+    - [ *D, *A ]
+    - [ *C, *A ]
