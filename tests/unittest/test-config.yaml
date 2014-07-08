@@ -38,3 +38,19 @@ infrastructures:
     - [ *D, *B ]
     - [ *B, *A ]
     - [ *C, *A ]
+-
+    name: linear
+    expected_output:
+    - !!set
+      ? A
+    - !!set
+      ? B
+    - !!set
+      ? C
+    - !!set
+      ? D
+    nodes: *NODES
+    dependencies:
+    - [ *D, *C ]
+    - [ *B, *A ]
+    - [ *C, *B ]
