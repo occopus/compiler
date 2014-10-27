@@ -82,6 +82,8 @@ class StaticDescription(object):
         self.infra_id = str(uuid.uuid4())
         self.name = desc['name']
         self.nodes = desc['nodes']
+        for i in self.nodes:
+            i['environment_id'] = self.infra_id
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
         self.topological_order = \
