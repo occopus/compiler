@@ -88,6 +88,7 @@ class StaticDescription(object):
         self.dependencies = desc['dependencies']
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.dependencies)
+        self.user_id = desc['user_id']
 
     @staticmethod
     def schema_check(infrastructure_description):
