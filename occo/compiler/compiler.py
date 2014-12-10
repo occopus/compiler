@@ -84,6 +84,10 @@ class StaticDescription(object):
         self.nodes = desc['nodes']
         for i in self.nodes:
             i['environment_id'] = self.infra_id
+            # Copying the user_id is an optimization, so IP::CreateNode does
+            # not need to resolve the containing infrastructure's static
+            # description.
+            i['user_id'] = desc['user_id']
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
         self.topological_order = \
