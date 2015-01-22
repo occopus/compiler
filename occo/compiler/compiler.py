@@ -29,6 +29,17 @@ The compiler may provide other services in the future, for example:
 
 .. todo:: We haven't thought through *updating* nodes in a running
     infrastructure. For starters, there is no :term:`IP` command for that.
+
+.. todo:: Move exceptions to a dedicated exception module.
+
+.. ifconfig:: api_doc is False
+
+    .. autoclass:: Edge
+        :members:
+    .. autoclass:: TopoLevel
+        :members:
+    .. autoclass:: TopologicalOrder
+        :members:
 """
 
 __all__ = ['StaticDescription', 'SchemaError']
@@ -41,7 +52,14 @@ class SchemaError(Exception):
     pass
 
 class Edge(object):
-    """Represents an edge of the infrastructure graph."""
+    """Represents an edge of the infrastructure graph.
+
+    :param dependent: The node that depends on the other. This node will come
+        later in the topographical order. The "source" node in the dependency
+        graph.
+    :param dependee: The node on which the other depends on. This node will
+        be instantiated first. The "destination" node in the dependency graph.
+    """
     def __init__(self, dependent, dependee):
         self.__dependent = dependent
         self.__dependee = dependee
@@ -55,49 +73,101 @@ class Edge(object):
         return self.__dependee
 
 class TopoLevel(list):
-    """Represents a topological level.
+    """Represents a topological level of the dependency graph.
 
-    Although being technically a list, the order of its items is irrelevant."""
+    Although it's implemented as a :class:`list`, the order of its items is
+    irrelevant. A :class:`list` is used instead of a :class:`set` because
+    insertion and iteration are faster, while only those two are used
+    (:class:`set` operations are not).
+
+    .. automethod:: __str__
+    """
     def add_node(self, node):
+        """ Add a node to the topological level. """
+        # Although currently just a proxy for list.append(), this abstraction
+        # makes changing the implementation of TopoLevel possible.
         self.append(node)
+
     def __str__(self):
+        """ Format the object as string.
+
+        This function is used for development only (debugging, logging,
+        testing), other components do not depend on it.
+
+        The format of the output can be parsed as YAML, and it will yield a
+        *set* (cf. the class documentation). The reason for this is that it
+        makes unit testing easier, because :meth:`set.__eq__` is oblivious to
+        the order of elements.
+
+        .. todo:: Use str.format instead of %
+        """
         return '- !!set\n%s'%('\n'.join('  ? %s'%n['name'] for n in self))
 
 class TopologicalOrder(list):
     """Represents the topological ordering of nodes.
 
-    This is a list of topological levels, in order. The nodes in the first
-    group do not depend on anything."""
+    This is a list of topological levels (:class:`TopoLevel`), in order. The
+    nodes in the first group do not depend on anything. Successive levels
+    depend on the the preceding one.
+
+    .. automethod:: __str__
+    """
     def add_level(self, level):
+        """ Add a node to the topological level. """
+        # Although currently just a proxy for list.append(), this abstraction
+        # makes changing the implementation of TopoLevel possible.
         self.append(level)
+
     def __str__(self):
+        """ Format the object as string.
+
+        This function is used for development only (debugging, logging,
+        testing), other components do not depend on it.
+        """
         return '\n'.join(str(i) for i in self)
 
 class StaticDescription(object):
     """Represents a statical description of an infrastructure.
 
+    :param infrastructure_description: The description of the infrastructure.
+        This can either be a YAML string, which will be parsed, or an already
+        parsed data structure (:class:`dict`). See :ref:`infradescription` for
+        details.
+
+    :raises SchemaError: if the schema is invalid.
+    :raises KeyError: if the schema is invalid, until :meth:`schema_check` is
+        implemented.
+
+    .. todo:: Implement :meth:`schema_check` and remove the ``:raises:``
+        clause about :exc:`ValueError`.
+
     :var infra_id: The unique identifier of the infrastructure, implicitly
-        generated #TODO: possibly specified id
+        generated.
     :var name: The name of the infrastructure
-    :var nodes: List of all nodes (order irrelevant)
-    :var node_lookup: Lookup table for nodes; the keys are their names
-    :var dependencies: List of edges
+    :var nodes: Unordered list of all nodes.
+    :var node_lookup: Lookup table for nodes based on their names.
+    :var dependencies: Unordered list of edges.
     :var topological_order: The topological ordering of the graph; see
-        TopologicalOrder and method topo_order
+        :class:`TopologicalOrder` and method :meth:`topo_order`.
+
+    .. todo:: The ``infra_id`` may be predefined?
     """
     def __init__(self, infrastructure_description):
+        # Deserialize description if necessary
         desc = infrastructure_description \
             if type(infrastructure_description) is dict \
             else yaml.load(infrastructure_description)
+
         StaticDescription.schema_check(desc)
+
         self.infra_id = str(uuid.uuid4())
         self.name = desc['name']
         self.nodes = desc['nodes']
         for i in self.nodes:
             i['environment_id'] = self.infra_id
-            # Copying the user_id is an optimization, so IP::CreateNode does
-            # not need to resolve the containing infrastructure's static
-            # description.
+            # Copying the user_id into all nodes' descriptions is an
+            # optimization, so IP::CreateNode does not need to resolve the
+            # containing infrastructure's static description.
             i['user_id'] = desc['user_id']
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
@@ -110,33 +180,50 @@ class StaticDescription(object):
         """This function will validate the infrastructure description upon
         creating this object.
 
-        If the schema is invalid, it will be signaled by raising a
-        SchemaError exception.
+        :raises SchemaError: if the schema is invalid.
 
-        TODO: implement schema checking."""
+        .. todo:: implement schema checking.
+        """
         pass
 
     @staticmethod
     def topo_order(all_nodes, all_dependencies):
         """Creates a topological ordering based on the list of nodes and
-        the list of edges."""
+        the list of edges.
+
+        .. todo:: Using generators instead of lists  (``(...for...)`` instead
+            ``[...for...]``) in the generating phase should be more
+            memory-efficient. Should try it and use it if it works.
+        """
+
         # Create representation suitable for topological ordering
+        ## List of nodes
         nodes = all_nodes
+        ## Convert pairs to Edges
         edges = [Edge(*ends) for ends in all_dependencies]
+
         # Return value:
         topo_order = TopologicalOrder()
+
         # Move all nodes into topo_order, level by level
         while nodes:
-            # All nodes that depend on something
+            # Negative logic: we need all independent nodes, but it needs
+            # calculating a NotExists quantifier, which is always inefficient.
+            # So:
+            ## All nodes that _do_ depend on _something_
             dependents = [i.dependent for i in edges]
-            # All nodes that do *not* depend on anything (nodes\dependents)
-            # These nodes constitute a topological level
+            ## Now it's simple: independent = all \ dependent
+            ## These nodes constitute a topological level
             topo_level = TopoLevel([n for n in nodes if not n in dependents])
-            # Remove nodes that were put in topo_level, as now they are
-            # satisfied dependencies.
+
+            # Remove nodes that were put in this topological level, as now they
+            # are satisfied dependencies.
             nodes = [n for n in nodes if not n in topo_level]
-            # Remove edges connected with nodes just removed.
+            # Remove half edges (edges connected with nodes just removed).
             edges = [e for e in edges if not e.dependee in topo_level]
 
+            # Add to output
             topo_order.add_level(topo_level)
+
+        # Done
         return topo_order
