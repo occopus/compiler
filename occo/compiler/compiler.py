@@ -4,16 +4,31 @@
 
 """Compiler module for the OCCO service.
 
+.. moduleauthor:: Adam Visegradi <adam.visegradi@sztaki.mta.hu>
+
 This module provides a compiler that generates a node grouping based on the
 topologial order of the infrastructure graph.
 
 Each group pertains to a topological level of the graph; that is, it contains no
-dependencies among its nodes. These nodes can be processed in parallel when
-possible.
+dependencies among its nodes. These nodes may be processed in parallel.
 
 The list of groups returned by the compiler represents the topological
 dependendencies in the infrastructure. Groups must be processed in sequence,
 without parallelization.
+
+The compiler may provide other services in the future, for example:
+  - Resolving all references in the descriptions (e.g. node type), recursively,
+    validating them early.
+  - Pre-resolving everything. This would imply that the Infrastructure
+    Processor will not need to do so, and that the descriptions become frozen
+    for this infrastructure instance immediately upon instantiation. (Late
+    resolution in the Infrastructure Processor may lead to inconsistency if the
+    user is allowed to change the descriptions while the infrastructure is
+    running.  However, freezing would make updating a running infrastructure
+    more challenging.
+
+.. todo:: We haven't thought through *updating* nodes in a running
+    infrastructure. For starters, there is no :term:`IP` command for that.
 """
 
 __all__ = ['StaticDescription', 'SchemaError']
@@ -61,18 +76,14 @@ class TopologicalOrder(list):
 class StaticDescription(object):
     """Represents a statical description of an infrastructure.
 
-    Attributes: #TODO: properties
-    - infra_id: the unique identifier of the infrastructure,
-                implicitly generated #TODO: possibly specified id
-    - name:     the name of the infrastructure
-    - nodes:    list of all nodes (order irrelevant)
-    - node_lookup:
-                lookup table for nodes; the keys are their names
-    - dependencies:
-                list of edges
-    - topological_order:
-                the topological ordering of the graph; see TopologicalOrder
-                and method topo_order
+    :var infra_id: The unique identifier of the infrastructure, implicitly
+        generated #TODO: possibly specified id
+    :var name: The name of the infrastructure
+    :var nodes: List of all nodes (order irrelevant)
+    :var node_lookup: Lookup table for nodes; the keys are their names
+    :var dependencies: List of edges
+    :var topological_order: The topological ordering of the graph; see
+        TopologicalOrder and method topo_order
     """
     def __init__(self, infrastructure_description):
         desc = infrastructure_description \
