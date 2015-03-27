@@ -182,11 +182,18 @@ class StaticDescription(object):
             - authentication information (``user_id``)
             - identifier of the instantiated infrastructure (``infra_id`` -->
                 ``environment_id``.
+            - variables (node description variables are kept intact)
 
         """
 
         for i in self.nodes:
             i['environment_id'] = self.infra_id # Foreign key, if you like
+
+            # Variables inherited from the infrastructure
+            # Variables specified in the node description are preferred
+            variables = desc.get('variables', dict())
+            variables.update(i.get('variables', dict()))
+            i['variables'] = variables
 
             # Copying the user_id into all nodes' descriptions is an
             # optimization, so IP::CreateNode does not need to resolve the
