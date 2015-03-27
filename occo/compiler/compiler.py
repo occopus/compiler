@@ -163,17 +163,35 @@ class StaticDescription(object):
         self.infra_id = str(uuid.uuid4())
         self.name = desc['name']
         self.nodes = desc['nodes']
-        for i in self.nodes:
-            i['environment_id'] = self.infra_id
-            # Copying the user_id into all nodes' descriptions is an
-            # optimization, so IP::CreateNode does not need to resolve the
-            # containing infrastructure's static description.
-            i['user_id'] = desc['user_id']
+
+        self.prepare_nodes(desc)
+
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.dependencies)
         self.user_id = desc['user_id']
+
+    def prepare_nodes(self, desc):
+        """
+        Sets up node descriptions.
+
+        Upon instantiating the infrastructure, instantiated node descriptions
+        inherit some of the information from the infrastructure description:
+
+            - authentication information (``user_id``)
+            - identifier of the instantiated infrastructure (``infra_id`` -->
+                ``environment_id``.
+
+        """
+
+        for i in self.nodes:
+            i['environment_id'] = self.infra_id # Foreign key, if you like
+
+            # Copying the user_id into all nodes' descriptions is an
+            # optimization, so IP::CreateNode does not need to resolve the
+            # containing infrastructure's static description.
+            i['user_id'] = desc['user_id']
 
     @staticmethod
     def schema_check(infrastructure_description):
