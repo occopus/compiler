@@ -24,6 +24,7 @@ nodes: &NODES
 infrastructures:
 -
     name: diamond
+    user_id: 1
     expected_output:
     - !!set
       ? A
@@ -40,6 +41,7 @@ infrastructures:
     - [ *C, *A ]
 -
     name: linear
+    user_id: 2
     expected_output:
     - !!set
       ? A
@@ -56,6 +58,7 @@ infrastructures:
     - [ *C, *B ]
 -
     name: singlestory
+    user_id: 3
     expected_output:
     - !!set
       ? A
@@ -70,6 +73,7 @@ infrastructures:
     - [ *C, *A ]
 -
     name: cloud
+    user_id: 4
     expected_output:
     - !!set
       ? A
@@ -80,6 +84,7 @@ infrastructures:
     dependencies: {}
 -
     name: complex
+    user_id: 5
     expected_output:
         - !!set
           ? A
