@@ -21,13 +21,10 @@ def gen_test_load_str(infra_desc):
 class CompilerTest(unittest.TestCase):
     pass
 
-if __name__ == '__main__':
-    with open('test-config.yaml') as f:
-        config = yaml.load(f)
-    for isdesc in config['infrastructures']:
-        setattr(CompilerTest, 'test_load_dict_%s'%isdesc['name'],
-                gen_test_load_dict(isdesc))
-        setattr(CompilerTest, 'test_load_str_%s'%isdesc['name'],
-                gen_test_load_str(isdesc))
-
-    unittest.main()
+with open('test-config.yaml') as f:
+    config = yaml.load(f)
+for isdesc in config['infrastructures']:
+    setattr(CompilerTest, 'test_load_dict_%s'%isdesc['name'],
+            gen_test_load_dict(isdesc))
+    setattr(CompilerTest, 'test_load_str_%s'%isdesc['name'],
+            gen_test_load_str(isdesc))
