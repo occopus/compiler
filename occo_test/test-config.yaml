@@ -38,7 +38,10 @@ infrastructures:
     - 
       connection: [ *D, *C ]
       mappings: 
-        - [ 'fqdn', 'wordpress.mysql_hostname' ]
+        -
+            attributes: [ 'fqdn', 'wordpress.mysql_hostname' ]
+            synch: true
+            arbitrary_parameter: anything
         - [ 'from', 'to' ]
     - [ *D, *B ]
     - [ *B, *A ]
@@ -47,6 +50,7 @@ infrastructures:
       mappings:
         - [ 'Cfqdn', 'wordpress.mysql_hostname' ]
         - [ 'Cfrom', 'to' ]
+      arbitrary_param: used by backend
 -
     name: linear
     user_id: 2
