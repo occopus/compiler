@@ -60,8 +60,9 @@ class AltInit(object):
             return cls(data)
 
 class Mapping(AltInit):
-    def __init__(self, attributes, synch=False):
+    def __init__(self, attributes, synch=False, **kwargs):
         self.attributes, self.synch = attributes, synch
+        self.__dict__.update(kwargs)
 
 class Edge(AltInit):
     """Represents an edge of the infrastructure graph.
@@ -72,9 +73,10 @@ class Edge(AltInit):
     :param dependee: The node on which the other depends on. This node will
         be instantiated first. The "destination" node in the dependency graph.
     """
-    def __init__(self, connection, mappings=[]):
+    def __init__(self, connection, mappings=[], **kwargs):
         self.__dependent, self.__dependee = connection
         self.__mappings = mappings
+        self.__dict__.update(kwargs)
     @property
     def dependent(self):
         """The node that depends on the other."""
