@@ -59,6 +59,10 @@ class AltInit(object):
         else:
             return cls(data)
 
+class Mapping(AltInit):
+    def __init__(self, attributes, synch=False):
+        self.attributes, self.synch = attributes, synch
+
 class Edge(AltInit):
     """Represents an edge of the infrastructure graph.
 
@@ -219,9 +223,10 @@ class StaticDescription(object):
             i['mappings'] = self.merge_mappings(i)
 
     def merge_mappings(self, node):
-        return dict((e.dependee['name'], e.mappings)
-                    for e in self.edges
-                    if e.dependent is node)
+        return dict(
+            (e.dependee['name'], [Mapping.altinst(m) for m in e.mappings])
+            for e in self.edges
+            if e.dependent is node)
 
     @staticmethod
     def schema_check(infrastructure_description):

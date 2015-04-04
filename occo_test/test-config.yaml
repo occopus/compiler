@@ -38,7 +38,9 @@ infrastructures:
     - 
       connection: [ *D, *C ]
       mappings: 
-        - [ 'fqdn', 'wordpress.mysql_hostname' ]
+        -
+            attributes: [ 'fqdn', 'wordpress.mysql_hostname' ]
+            synch: true
         - [ 'from', 'to' ]
     - [ *D, *B ]
     - [ *B, *A ]
