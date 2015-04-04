@@ -34,6 +34,10 @@ The compiler may provide other services in the future, for example:
 
 .. ifconfig:: api_doc is False
 
+    .. autoclass:: AltInit
+        :members:
+    .. autoclass:: Mapping
+        :members:
     .. autoclass:: Edge
         :members:
     .. autoclass:: TopoLevel
@@ -52,6 +56,33 @@ class SchemaError(Exception):
     pass
 
 class AltInit(object):
+    """
+    Allows alternative instantiations of the class.
+
+    The parameter can either be a dictionary or another object. If a dictionary
+    is specified, it will be used as constructor parameters (``**``). If
+    anything else is specified, it will be used as the sole positional argument
+    for the consturctor.
+
+    This only works with constructors having the following signature:
+
+    ``__init__( self, mandatory [ , optional_1=X [ , optional_2=Y [ ... ] ] ] [ , **kwargs ] )``
+
+    ---Where ``mandatory`` *must not be* a dictionary.
+
+    Using this, configuration can omit a dictionary specification, if only the
+    mandatory argument is to be specified. E.g.:
+
+    .. code-block:: yaml
+
+        # Instead of this:
+        obj:
+            mandatory: 1
+
+        # Only this:
+        obj: 1
+
+    """
     @classmethod
     def altinst(cls, data):
         if type(data) is dict:
@@ -60,6 +91,18 @@ class AltInit(object):
             return cls(data)
 
 class Mapping(AltInit):
+    """
+    Represents an attribute mapping between nodes; excluding node references.
+
+    That is, a complete mapping between two nodes can be described with a
+    triplet of (``Node``, ``Node``, ``Mapping``).
+
+    :param attributes: The two attributes to be connected.
+    :type attributes: Pair (:class:`list` or :func:`tuple` of two :class:`str`\
+        s).
+    :param ** kwargs: Arbitrary information that can be used by mediating
+        services (InfraProcessor, node Resolver, etc.)
+    """
     def __init__(self, attributes, synch=False, **kwargs):
         self.attributes, self.synch = attributes, synch
         self.__dict__.update(kwargs)
@@ -67,11 +110,11 @@ class Mapping(AltInit):
 class Edge(AltInit):
     """Represents an edge of the infrastructure graph.
 
-    :param dependent: The node that depends on the other. This node will come
-        later in the topographical order. The "source" node in the dependency
-        graph.
-    :param dependee: The node on which the other depends on. This node will
-        be instantiated first. The "destination" node in the dependency graph.
+    :param connection: The two nodes connected.
+    :type connection: Pair (:class:`list` or :func:`tuple` of two nodes).
+    :param mappings: The attribute mappings between the nodes.
+    :param ** kwargs: Arbitrary information that can be used by mediating
+        services (InfraProcessor, node Resolver, etc.)
     """
     def __init__(self, connection, mappings=[], **kwargs):
         self.__dependent, self.__dependee = connection
