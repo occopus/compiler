@@ -35,10 +35,18 @@ infrastructures:
       ? D
     nodes: *NODES
     dependencies:
-    - [ *D, *C ]
+    - 
+      connection: [ *D, *C ]
+      mappings: 
+        - [ 'fqdn', 'wordpress.mysql_hostname' ]
+        - [ 'from', 'to' ]
     - [ *D, *B ]
     - [ *B, *A ]
-    - [ *C, *A ]
+    -
+      connection: [ *C, *A ]
+      mappings:
+        - [ 'Cfqdn', 'wordpress.mysql_hostname' ]
+        - [ 'Cfrom', 'to' ]
 -
     name: linear
     user_id: 2
