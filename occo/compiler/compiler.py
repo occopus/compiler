@@ -60,9 +60,15 @@ class Edge(object):
     :param dependee: The node on which the other depends on. This node will
         be instantiated first. The "destination" node in the dependency graph.
     """
-    def __init__(self, dependent, dependee):
-        self.__dependent = dependent
-        self.__dependee = dependee
+    def __init__(self, data):
+        if type(data) is list:
+            # There is an edge with no information transfer specified
+            self.__dependent, self.__dependee = data
+            self.__mappings = []
+        else:
+            # Complete edge specification
+            self.__dependent, self.__dependee = data['connection']
+            self.__mappings = data['mappings']
     @property
     def dependent(self):
         """The node that depends on the other."""
@@ -71,6 +77,10 @@ class Edge(object):
     def dependee(self):
         """The node that is depended on by the other."""
         return self.__dependee
+    @property
+    def mappings(self):
+        """Attribute mappings between vertices."""
+        return self.__mappings
 
 class TopoLevel(list):
     """Represents a topological level of the dependency graph.
@@ -168,8 +178,9 @@ class StaticDescription(object):
 
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
+        self.edges = [Edge(e) for e in self.dependencies]
         self.topological_order = \
-            StaticDescription.topo_order(self.nodes, self.dependencies)
+            StaticDescription.topo_order(self.nodes, self.edges)
         self.user_id = desc['user_id']
 
     def prepare_nodes(self, desc):
@@ -212,7 +223,7 @@ class StaticDescription(object):
         pass
 
     @staticmethod
-    def topo_order(all_nodes, all_dependencies):
+    def topo_order(all_nodes, all_edges):
         """Creates a topological ordering based on the list of nodes and
         the list of edges.
 
@@ -225,7 +236,7 @@ class StaticDescription(object):
         ## List of nodes
         nodes = all_nodes
         ## Convert pairs to Edges
-        edges = [Edge(*ends) for ends in all_dependencies]
+        edges = all_edges
 
         # Return value:
         topo_order = TopologicalOrder()

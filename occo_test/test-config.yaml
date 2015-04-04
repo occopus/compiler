@@ -35,7 +35,10 @@ infrastructures:
       ? D
     nodes: *NODES
     dependencies:
-    - [ *D, *C ]
+    - 
+      connection: [ *D, *C ]
+      mappings: 
+        - [ 'fqdn', 'wordpress.mysql_hostname' ]
     - [ *D, *B ]
     - [ *B, *A ]
     - [ *C, *A ]
