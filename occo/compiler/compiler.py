@@ -51,7 +51,15 @@ class SchemaError(Exception):
     """Exception representing a schema error in the input data."""
     pass
 
-class Edge(object):
+class AltInit(object):
+    @classmethod
+    def altinst(cls, data):
+        if type(data) is dict:
+            return cls(**data)
+        else:
+            return cls(data)
+
+class Edge(AltInit):
     """Represents an edge of the infrastructure graph.
 
     :param dependent: The node that depends on the other. This node will come
@@ -60,15 +68,9 @@ class Edge(object):
     :param dependee: The node on which the other depends on. This node will
         be instantiated first. The "destination" node in the dependency graph.
     """
-    def __init__(self, data):
-        if type(data) is list:
-            # There is an edge with no information transfer specified
-            self.__dependent, self.__dependee = data
-            self.__mappings = []
-        else:
-            # Complete edge specification
-            self.__dependent, self.__dependee = data['connection']
-            self.__mappings = data['mappings']
+    def __init__(self, connection, mappings=[]):
+        self.__dependent, self.__dependee = connection
+        self.__mappings = mappings
     @property
     def dependent(self):
         """The node that depends on the other."""
@@ -176,7 +178,7 @@ class StaticDescription(object):
 
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
-        self.edges = [Edge(e) for e in self.dependencies]
+        self.edges = [Edge.altinst(e) for e in self.dependencies]
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.edges)
         self.prepare_nodes(desc)
