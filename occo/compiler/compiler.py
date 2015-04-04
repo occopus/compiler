@@ -90,7 +90,7 @@ class AltInit(object):
         else:
             return cls(data)
 
-class Mapping(AltInit):
+class Mapping(yaml.YAMLObject, AltInit):
     """
     Represents an attribute mapping between nodes; excluding node references.
 
@@ -270,10 +270,18 @@ class StaticDescription(object):
             i['mappings'] = self.merge_mappings(i)
 
     def merge_mappings(self, node):
-        return dict(
-            (e.dependee['name'], [Mapping.altinst(m) for m in e.mappings])
-            for e in self.edges
-            if e.dependent is node)
+        inbound, outbound = dict(), dict()
+        for e in self.edges:
+            if e.dependee is node:
+                dest, key = outbound, e.dependent['name']
+            elif e.dependent is node:
+                dest, key = inbound, e.dependee['name']
+            else:
+                continue
+
+            dest[key] = [Mapping.altinst(m).__dict__
+                         for m in e.mappings]
+        return dict(inbound=inbound, outbound=outbound)
 
     @staticmethod
     def schema_check(infrastructure_description):
