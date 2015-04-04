@@ -174,13 +174,12 @@ class StaticDescription(object):
         self.name = desc['name']
         self.nodes = desc['nodes']
 
-        self.prepare_nodes(desc)
-
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
         self.edges = [Edge(e) for e in self.dependencies]
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.edges)
+        self.prepare_nodes(desc)
         self.user_id = desc['user_id']
 
     def prepare_nodes(self, desc):
@@ -194,6 +193,9 @@ class StaticDescription(object):
             - identifier of the instantiated infrastructure (``infra_id`` -->
                 ``environment_id``.
             - variables (node description variables are kept intact)
+            - attribute mappings
+
+        The resulting node description should be completely self-contained.
 
         """
 
@@ -210,6 +212,14 @@ class StaticDescription(object):
             # optimization, so IP::CreateNode does not need to resolve the
             # containing infrastructure's static description.
             i['user_id'] = desc['user_id']
+
+            # Setup attribute mappings based on infrastructure description
+            i['mappings'] = self.merge_mappings(i)
+
+    def merge_mappings(self, node):
+        return dict((e.dependee['name'], e.mappings)
+                    for e in self.edges
+                    if e.dependent is node)
 
     @staticmethod
     def schema_check(infrastructure_description):
