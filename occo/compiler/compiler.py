@@ -34,10 +34,8 @@ The compiler may provide other services in the future, for example:
 
 .. ifconfig:: api_doc is False
 
-    .. autoclass:: AltInit
-        :members:
-    .. autoclass:: Mapping
-        :members:
+    .. autofunction:: altcall
+    .. autofunction:: create_mapping
     .. autoclass:: Edge
         :members:
     .. autoclass:: TopoLevel
@@ -55,18 +53,18 @@ class SchemaError(Exception):
     """Exception representing a schema error in the input data."""
     pass
 
-class AltInit(object):
+def altcall(target, data):
     """
-    Allows alternative instantiations of the class.
+    Allows alternative calling of a function/method.
 
     The parameter can either be a dictionary or another object. If a dictionary
-    is specified, it will be used as constructor parameters (``**``). If
-    anything else is specified, it will be used as the sole positional argument
-    for the consturctor.
+    is specified, it will be used as parameters (``**``). If anything else is
+    specified, it will be used as the sole positional argument for the
+    method..
 
-    This only works with constructors having the following signature:
+    This only works with methods having the following signature:
 
-    ``__init__( self, mandatory [ , optional_1=X [ , optional_2=Y [ ... ] ] ] [ , **kwargs ] )``
+    ``foo( self, mandatory [ , optional_1=X [ , optional_2=Y [ ... ] ] ] [ , **kwargs ] )``
 
     ---Where ``mandatory`` *must not be* a dictionary.
 
@@ -83,16 +81,14 @@ class AltInit(object):
         obj: 1
 
     """
-    @classmethod
-    def altinst(cls, data):
-        if type(data) is dict:
-            return cls(**data)
-        else:
-            return cls(data)
+    if type(data) is dict:
+        return target(**data)
+    else:
+        return target(data)
 
-class Mapping(yaml.YAMLObject, AltInit):
+def create_mapping(attributes, synch=False, **kwargs):
     """
-    Represents an attribute mapping between nodes; excluding node references.
+    Creates an attribute mapping between nodes; excluding node references.
 
     That is, a complete mapping between two nodes can be described with a
     triplet of (``Node``, ``Node``, ``Mapping``).
@@ -105,11 +101,11 @@ class Mapping(yaml.YAMLObject, AltInit):
     :param ** kwargs: Arbitrary information that can be used by mediating
         services (InfraProcessor, node Resolver, etc.)
     """
-    def __init__(self, attributes, synch=False, **kwargs):
-        self.attributes, self.synch = attributes, synch
-        self.__dict__.update(kwargs)
+    retval = dict(attributes=attributes, synch=synch)
+    retval.update(kwargs)
+    return retval
 
-class Edge(AltInit):
+class Edge(object):
     """Represents an edge of the infrastructure graph.
 
     :param connection: The two nodes connected.
@@ -229,7 +225,7 @@ class StaticDescription(object):
 
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
         self.dependencies = desc['dependencies']
-        self.edges = [Edge.altinst(e) for e in self.dependencies]
+        self.edges = [altcall(Edge, e) for e in self.dependencies]
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.edges)
         self.prepare_nodes(desc)
@@ -279,8 +275,7 @@ class StaticDescription(object):
             else:
                 continue
 
-            dest[key] = [Mapping.altinst(m).__dict__
-                         for m in e.mappings]
+            dest[key] = [altcall(create_mapping, m) for m in e.mappings]
         return dict(inbound=inbound, outbound=outbound)
 
     @staticmethod
