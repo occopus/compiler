@@ -100,6 +100,8 @@ class Mapping(AltInit):
     :param attributes: The two attributes to be connected.
     :type attributes: Pair (:class:`list` or :func:`tuple` of two :class:`str`\
         s).
+    :param bool synch: The InfraProcessor should synchronize on this attribute
+        (wait for the upstream node to export this attribute).
     :param ** kwargs: Arbitrary information that can be used by mediating
         services (InfraProcessor, node Resolver, etc.)
     """
