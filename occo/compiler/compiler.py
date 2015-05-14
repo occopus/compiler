@@ -230,6 +230,7 @@ class StaticDescription(object):
             StaticDescription.topo_order(self.nodes, self.edges)
         self.prepare_nodes(desc)
         self.user_id = desc['user_id']
+        self.variables = desc.get('variables', dict())
 
     def prepare_nodes(self, desc):
         """
