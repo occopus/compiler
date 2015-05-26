@@ -254,7 +254,8 @@ class StaticDescription(object):
 
             # Variables inherited from the infrastructure
             # Variables specified in the node description are preferred
-            variables = desc.get('variables', dict())
+            # TODO Do a deep copy here
+            variables = dict(desc.get('variables', dict()))
             variables.update(i.get('variables', dict()))
             i['variables'] = variables
 
