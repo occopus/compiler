@@ -141,11 +141,6 @@ class TopoLevel(list):
 
     .. automethod:: __str__
     """
-    def add_node(self, node):
-        """ Add a node to the topological level. """
-        # Although currently just a proxy for list.append(), this abstraction
-        # makes changing the implementation of TopoLevel possible.
-        self.append(node)
 
     def __str__(self):
         """ Format the object as string.
