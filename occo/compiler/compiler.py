@@ -314,7 +314,7 @@ class StaticDescription(object):
             dependents = [i.dependent for i in edges]
             ## Now it's simple: independent = all \ dependent
             ## These nodes constitute a topological level
-            topo_level = TopoLevel([n for n in nodes if not n in dependents])
+            topo_level = TopoLevel(n for n in nodes if not n in dependents)
 
             # Remove nodes that were put in this topological level, as now they
             # are satisfied dependencies.
