@@ -141,11 +141,6 @@ class TopoLevel(list):
 
     .. automethod:: __str__
     """
-    def add_node(self, node):
-        """ Add a node to the topological level. """
-        # Although currently just a proxy for list.append(), this abstraction
-        # makes changing the implementation of TopoLevel possible.
-        self.append(node)
 
     def __str__(self):
         """ Format the object as string.
@@ -319,7 +314,7 @@ class StaticDescription(object):
             dependents = [i.dependent for i in edges]
             ## Now it's simple: independent = all \ dependent
             ## These nodes constitute a topological level
-            topo_level = TopoLevel([n for n in nodes if not n in dependents])
+            topo_level = TopoLevel(n for n in nodes if not n in dependents)
 
             # Remove nodes that were put in this topological level, as now they
             # are satisfied dependencies.

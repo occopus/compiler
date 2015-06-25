@@ -84,6 +84,20 @@ infrastructures:
     - [ *D, *A ]
     - [ *C, *A ]
 -
+    name: noedge
+    user_id: 3
+    expected_output:
+    - !!set
+      ? A
+      ? D
+    - !!set
+      ? B
+      ? C
+    nodes: *NODES
+    dependencies:
+    - [ *B, *A ]
+    - [ *C, *A ]
+-
     name: cloud
     user_id: 4
     expected_output:
