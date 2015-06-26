@@ -48,6 +48,7 @@ __all__ = ['StaticDescription', 'SchemaError']
 
 import yaml
 import uuid
+import occo.util as util
 
 class SchemaError(Exception):
     """Exception representing a schema error in the input data."""
@@ -249,10 +250,8 @@ class StaticDescription(object):
 
             # Variables inherited from the infrastructure
             # Variables specified in the node description are preferred
-            # TODO Do a deep copy here
-            variables = dict(desc.get('variables', dict()))
-            variables.update(i.get('variables', dict()))
-            i['variables'] = variables
+            i['variables'] = util.dict_merge(desc.get('variables', dict()),
+                                             i.get('variables', dict()))
 
             # Copying the user_id into all nodes' descriptions is an
             # optimization, so IP::CreateNode does not need to resolve the
