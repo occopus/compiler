@@ -49,10 +49,7 @@ __all__ = ['StaticDescription', 'SchemaError']
 import yaml
 import uuid
 import occo.util as util
-
-class SchemaError(Exception):
-    """Exception representing a schema error in the input data."""
-    pass
+from occo.exceptions import SchemaError
 
 def altcall(target, data):
     """
