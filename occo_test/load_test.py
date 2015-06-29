@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 import occo.compiler as compiler
 import yaml

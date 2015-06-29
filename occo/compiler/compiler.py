@@ -233,8 +233,7 @@ class StaticDescription(object):
         inherit some of the information from the infrastructure description:
 
             - authentication information (``user_id``)
-            - identifier of the instantiated infrastructure (``infra_id`` -->
-                ``environment_id``.
+            - identifier of the instantiated infrastructure (``infra_id``)
             - variables (node description variables are kept intact)
             - attribute mappings
 
@@ -243,7 +242,7 @@ class StaticDescription(object):
         """
 
         for i in self.nodes:
-            i['environment_id'] = self.infra_id # Foreign key, if you like
+            i['infra_id'] = self.infra_id # Foreign key, if you like
 
             # Variables inherited from the infrastructure
             # Variables specified in the node description are preferred
