@@ -217,7 +217,7 @@ class StaticDescription(object):
         self.nodes = desc['nodes']
 
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
-        self.dependencies = desc['dependencies'] if 'dependencies' in desc else []
+        self.dependencies = desc.get('dependencies', [])
         self.edges = [altcall(Edge, e) for e in self.dependencies]
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.edges)
