@@ -217,7 +217,7 @@ class StaticDescription(object):
         self.nodes = desc['nodes']
 
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
-        self.dependencies = desc['dependencies']
+        self.dependencies = desc.get('dependencies', [])
         self.edges = [altcall(Edge, e) for e in self.dependencies]
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.edges)
@@ -310,7 +310,10 @@ class StaticDescription(object):
             ## Now it's simple: independent = all \ dependent
             ## These nodes constitute a topological level
             topo_level = TopoLevel(n for n in nodes if not n in dependents)
-
+            # if topo_level is empty while nodes are not, there must be a circle
+            # among the nodes through the edges
+            if not topo_level:
+                raise SchemaError("Cycle detected.",nodes)
             # Remove nodes that were put in this topological level, as now they
             # are satisfied dependencies.
             nodes = [n for n in nodes if not n in topo_level]
