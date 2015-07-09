@@ -312,8 +312,8 @@ class StaticDescription(object):
             topo_level = TopoLevel(n for n in nodes if not n in dependents)
             # if topo_level is empty while nodes are not, there must be a circle
             # among the nodes through the edges
-            if not topo_level :
-                raise SchemaError
+            if not topo_level:
+                raise SchemaError("Cycle detected.",nodes)
             # Remove nodes that were put in this topological level, as now they
             # are satisfied dependencies.
             nodes = [n for n in nodes if not n in topo_level]
