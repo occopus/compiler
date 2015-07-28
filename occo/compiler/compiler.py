@@ -224,6 +224,7 @@ class StaticDescription(object):
         self.prepare_nodes(desc)
         self.user_id = desc['user_id']
         self.variables = desc.get('variables', dict())
+        self.suspended = desc.get('init_suspended', False)
 
     def prepare_nodes(self, desc):
         """
