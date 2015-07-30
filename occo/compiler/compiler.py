@@ -30,8 +30,6 @@ The compiler may provide other services in the future, for example:
 .. todo:: We haven't thought through *updating* nodes in a running
     infrastructure. For starters, there is no :term:`IP` command for that.
 
-.. todo:: Move exceptions to a dedicated exception module.
-
 .. ifconfig:: api_doc is False
 
     .. autofunction:: altcall
