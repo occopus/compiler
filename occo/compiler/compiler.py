@@ -53,6 +53,8 @@ def altcall(target, data):
     """
     Allows alternative calling of a function/method.
 
+    This function facilitates flexibly simple data structures (e.g. dependencies).
+
     The parameter can either be a dictionary or another object. If a dictionary
     is specified, it will be used as parameters (``**``). If anything else is
     specified, it will be used as the sole positional argument for the
