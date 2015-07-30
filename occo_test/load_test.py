@@ -23,7 +23,7 @@ class CompilerTest(unittest.TestCase):
 with open(util.rel_to_file('test-config.yaml')) as f:
     config = yaml.load(f)
 for isdesc in config['infrastructures']:
-    setattr(CompilerTest, 'test_load_dict_%s'%isdesc['name'],
+    setattr(CompilerTest, 'test_load_dict_{0[name]}'.format(isdesc),
             gen_case_load_dict(isdesc))
-    setattr(CompilerTest, 'test_load_str_%s'%isdesc['name'],
+    setattr(CompilerTest, 'test_load_str_{0[name]}'.format(isdesc),
             gen_case_load_str(isdesc))

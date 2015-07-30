@@ -150,10 +150,8 @@ class TopoLevel(list):
         *set* (cf. the class documentation). The reason for this is that it
         makes unit testing easier, because :meth:`set.__eq__` is oblivious to
         the order of elements.
-
-        .. todo:: Use str.format instead of %
         """
-        return '- !!set\n%s'%('\n'.join('  ? %s'%n['name'] for n in self))
+        return '- !!set\n{0}'.format('\n'.join('  ? {0[name]}'.format(n) for n in self))
 
 class TopologicalOrder(list):
     """Represents the topological ordering of nodes.
