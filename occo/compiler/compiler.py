@@ -223,6 +223,7 @@ class StaticDescription(object):
         self.user_id = desc['user_id']
         self.variables = desc.get('variables', dict())
         self.suspended = desc.get('init_suspended', False)
+        self.userinfo_strategy = desc.get('userinfo_strategy')
 
     def prepare_nodes(self, desc):
         """
