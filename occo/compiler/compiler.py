@@ -220,7 +220,7 @@ class StaticDescription(object):
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.edges)
         self.prepare_nodes(desc)
-        self.user_id = desc['user_id']
+        self.user_id = desc.get('user_id')
         self.variables = desc.get('variables', dict())
         self.suspended = desc.get('init_suspended', False)
         self.userinfo_strategy = desc.get('userinfo_strategy')
