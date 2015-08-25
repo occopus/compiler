@@ -1,7 +1,4 @@
---find-links http://c155-10.localcloud:8080/packages
---no-index
-
 argparse==1.2.1
-PyYAML==3.11
 python-dateutil==2.2
+PyYAML==3.11
 OCCO-Util==0.1.0
