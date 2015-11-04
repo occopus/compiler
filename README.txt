@@ -1,6 +1,3 @@
-===
-OCCO Compiler Module
-===
 
-Provides an infrastructure compiler for OCCO. 
+Occopus Compiler Module providing an infrastructure compiler for Occopus. 
 
