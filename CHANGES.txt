@@ -1,0 +1,9 @@
+
+v0.2.0 - November 2015
+- Topological ordering
+- Handling dependencies
+- Mapping attributes
+- Add checking for dependency circles
+- Add userinfor_strategy to static description
+- Support pluginable infrastructure summary
+

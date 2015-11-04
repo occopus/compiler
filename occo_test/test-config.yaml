@@ -1,0 +1,149 @@
+nodes: &NODES
+- &A
+    name: A
+    roles:
+    - X-role
+- &B
+    name: B
+    roles:
+    - Y-role
+    - Z-role
+    scaling:
+        max: 5
+- &C
+    name: C
+    roles:
+    - Q-role
+    scaling:
+        min: 2
+        max: 5
+- &D
+    name: D
+    roles:
+    - R-role
+infrastructures:
+-
+    name: diamond
+    user_id: 1
+    expected_output:
+    - !!set
+      ? A
+    - !!set
+      ? C
+      ? B
+    - !!set
+      ? D
+    nodes: *NODES
+    dependencies:
+    - 
+      connection: [ *D, *C ]
+      mappings: 
+        -
+            attributes: [ 'fqdn', 'wordpress.mysql_hostname' ]
+            synch: true
+            arbitrary_parameter: anything
+        - [ 'from', 'to' ]
+    - [ *D, *B ]
+    - [ *B, *A ]
+    -
+      connection: [ *C, *A ]
+      mappings:
+        - [ 'Cfqdn', 'wordpress.mysql_hostname' ]
+        - [ 'Cfrom', 'to' ]
+      arbitrary_param: used by backend
+-
+    name: linear
+    user_id: 2
+    expected_output:
+    - !!set
+      ? A
+    - !!set
+      ? B
+    - !!set
+      ? C
+    - !!set
+      ? D
+    nodes: *NODES
+    dependencies:
+    - [ *D, *C ]
+    - [ *B, *A ]
+    - [ *C, *B ]
+-
+    name: singlestory
+    user_id: 3
+    expected_output:
+    - !!set
+      ? A
+    - !!set
+      ? B
+      ? C
+      ? D
+    nodes: *NODES
+    dependencies:
+    - [ *B, *A ]
+    - [ *D, *A ]
+    - [ *C, *A ]
+-
+    name: noedge
+    user_id: 3
+    expected_output:
+    - !!set
+      ? A
+      ? D
+    - !!set
+      ? B
+      ? C
+    nodes: *NODES
+    dependencies:
+    - [ *B, *A ]
+    - [ *C, *A ]
+-
+    name: cloud
+    user_id: 4
+    expected_output:
+    - !!set
+      ? A
+      ? B
+      ? C
+      ? D
+    nodes: *NODES
+    dependencies: {}
+-
+    name: complex
+    user_id: 5
+    expected_output:
+        - !!set
+          ? A
+          ? B
+        - !!set
+          ? C
+          ? D
+          ? E
+        - !!set
+          ? F
+          ? G
+        - !!set
+          ? H
+    nodes:
+    - *A
+    - *B
+    - *C
+    - *D
+    - &E
+      name: E
+    - &F
+      name: F
+    - &G
+      name: G
+    - &H
+      name: H
+    dependencies:
+    - [ *H, *C ]
+    - [ *H, *F ]
+    - [ *F, *D ]
+    - [ *F, *E ]
+    - [ *G, *C ]
+    - [ *G, *D ]
+    - [ *E, *B ]
+    - [ *C, *A ]
+    - [ *D, *A ]
