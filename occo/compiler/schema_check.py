@@ -16,7 +16,22 @@ class SchemaChecker(object):
     @staticmethod
     def check_node_def(node_defs):
         for nodename, node_def in node_defs.iteritems():
+            if nodename.split(':')[0] is not 'node_def':
+                context = "[SCHEMA] ERROR in node %r - " % nodename
+                msg = "wrong node_definition name format"
+                raise SchemaError(msg, context)
+            if node_def is not list:
+                context = "[SCHEMA] ERROR in node %r - " % nodename
+                msg = "node_definition has to be a list of dicts"
+                raise SchemaError(msg, context)
             for node in node_def:
+                #check for invalid sections:
+                for key in node
+                    if key not in ["resource", "config-management",
+                            "contextualisation", "health_check"]:
+                        context = "[SCHEMA] ERROR in node %r - " % nodename
+                        msg = "invalid section %r" % key
+                        raise SchemaError(msg, context)
                 nodeindex = node_def.index(node)
                 #resource section
                 try:
@@ -53,8 +68,8 @@ class SchemaChecker(object):
                 
                 #contextualization section
                 try:
-                    if 'contextualization' in node:
-                        cont = node['contextualization']
+                    if 'contextualisation' in node:
+                        cont = node['contextualisation']
                         if 'type' not in cont:
                             raise SchemaError("missing key \'type\'")
                         else:
@@ -64,7 +79,7 @@ class SchemaChecker(object):
                             checker = ContextSchemaChecker.instantiate(protocol=protocol)
                             checker.perform_check(cont)
                 except SchemaError as e:
-                    context = "[SCHEMA] ERROR in contextualization section of node %r[%d] - " % (nodename, nodeindex)
+                    context = "[SCHEMA] ERROR in contextualisation section of node %r[%d] - " % (nodename, nodeindex)
                     raise SchemaError(e.msg, context)
                         
                 #health_check section
