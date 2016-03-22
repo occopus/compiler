@@ -58,7 +58,7 @@ class SchemaChecker(object):
                             raise SchemaError("missing key \'type\'")
                         else:
                             protocol = cont['type']
-                            libname = "occo.plugins.node_resolution." + protocol
+                            libname = "occo.plugins.infraprocessor.node_resolution." + protocol
                             importlib.import_module(libname)
                             checker = ContextSchemaChecker.instantiate(protocol=protocol)
                             checker.perform_check(cont)
