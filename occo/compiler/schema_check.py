@@ -16,6 +16,14 @@ class SchemaChecker(object):
     @staticmethod
     def check_node_def(node_defs):
         for nodename, node_def in node_defs.iteritems():
+            if nodename.split(':')[0] is not 'node_def':
+                context = "[SCHEMA] ERROR in node %r - " % nodename
+                msg = "wrong node_definition name format"
+                raise SchemaError(msg, context)
+            if node_def is not list:
+                context = "[SCHEMA] ERROR in node %r - " % nodename
+                msg = "node_definition has to be a list of dicts"
+                raise SchemaError(msg, context)
             for node in node_def:
                 nodeindex = node_def.index(node)
                 #resource section
