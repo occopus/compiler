@@ -1,6 +1,7 @@
 from occo.resourcehandler import RHSchemaChecker
 from occo.configmanager import CMSchemaChecker
 from occo.exceptions import SchemaError
+from occo.infraprocessor.node_resolution import ContextSchemaChecker
 import importlib
 
 class SchemaChecker(object):
