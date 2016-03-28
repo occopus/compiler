@@ -2,6 +2,7 @@ from occo.resourcehandler import RHSchemaChecker
 from occo.configmanager import CMSchemaChecker
 from occo.exceptions import SchemaError
 from occo.infraprocessor.node_resolution import ContextSchemaChecker
+from occo.infraprocessor.synchronization import HCSchemaChecker
 import importlib
 
 class SchemaChecker(object):
@@ -84,3 +85,18 @@ class SchemaChecker(object):
                     raise SchemaError(e.msg, context)
                         
                 #health_check section
+                try:
+                    if 'health_check' in node:
+                        hc = node['health_check']
+                        if 'type' not in hc:
+                            hc['type'] = 'basic'
+                        if hc['type'] == 'basic':
+                            libname = "occo.infraprocessor.synchronization"
+                        else:
+                            libname = "occo.infraprocessor.synchronization." + hc['type']
+                        importlib.import_module(libname)
+                        checker = HCSchemaChecker.instantiate(protocol=hc['type'])
+                        checker.perform_check(hc)
+                except SchemaError as e:
+                    context = "[SchemaCheck] ERROR in 'health_check' section of node %r[%d]: " % (realnodename, nodeindex)
+                    raise SchemaError(e.msg, context)
