@@ -2,16 +2,48 @@ from occo.resourcehandler import RHSchemaChecker
 from occo.configmanager import CMSchemaChecker
 from occo.exceptions import SchemaError
 from occo.infraprocessor.node_resolution import ContextSchemaChecker
+from occo.infraprocessor.synchronization import HCSchemaChecker
 import importlib
 
 class SchemaChecker(object):
     @staticmethod
     def check_infra_desc(infra_desc):
-        print "check_infra\n"
-
-    @staticmethod
-    def check_nodes(nodes):
-        print "check_nodes\n"
+        print infra_desc
+        keys = infra_desc.keys()
+        if 'user_id' not in keys:
+            print "[SchemaCheck] WARNING: user_id is not defined in infrastructure description"
+        if 'infra_name' not in keys:
+            print "[SchemaCheck] WARNING: infra_name is not defined in infrastructure description"
+        if 'nodes' not in keys:
+            raise SchemaError("[SchemaCheck] ERROR: \"nodes\" must be defined in infrastructure description")
+        for node in infra_desc['nodes']:
+            nodekeys = node.keys()
+            if 'name' not in nodekeys:
+                raise SchemaError("[SchemaCheck] ERROR: missing key \"name\" in node")
+            if 'type' not in nodekeys:
+                raise SchemaError("[SchemaCheck] ERROR: missing key \"type\" in node %r" % node['name'])
+            if 'scaling' not in nodekeys:
+                print "[SchemaCheck] WARNING: missing \"scaling\" parameter in node %r, using default scaling (single instance)" % node['name']
+            else:
+                for key in node['scaling']:
+                    if key not in ['min', 'max']:
+                        raise SchemaError("[SchemaCheck] ERROR: invalid key \"%r\" in scaling of node %r" % (key, node['name']))
+            if 'filter' in nodekeys and not isinstance(node['filter'], dict):
+                raise SchemaError("[SchemaCheck] ERROR: invalid type of filter in node %r - has to be dict" % node['name'])
+            for key in nodekeys:
+                if key not in ['name', 'type', 'scaling', 'filter', 'variables']:
+                    raise SchemaError("[SchemaCheck] ERROR: invalid key \"%r\" in node %r" % (key, node['name']))
+        if 'dependencies' not in keys:
+            print "[SchemaCheck] WARNING: no dependencies specified - using sequential ordering"
+        else:
+            for dep in infra_desc['dependencies']:
+                if isinstance(dep, dict):
+                    depkeys = dep.keys()
+                    if 'connection' not in depkeys:
+                        raise SchemaError("[SchemaCheck] ERROR: undefined connection ")
+        for key in keys:
+            if key not in ['user_id', 'infra_name', 'nodes', 'dependencies', 'variables']:
+                raise SchemaError("[SchemaCheck] ERROR: invalid key %r in infastructure description" % key)
     
     @staticmethod
     def check_node_def(node_defs):
@@ -84,3 +116,18 @@ class SchemaChecker(object):
                     raise SchemaError(e.msg, context)
                         
                 #health_check section
+                try:
+                    if 'health_check' in node:
+                        hc = node['health_check']
+                        if 'type' not in hc:
+                            hc['type'] = 'basic'
+                        if hc['type'] == 'basic':
+                            libname = "occo.infraprocessor.synchronization"
+                        else:
+                            libname = "occo.infraprocessor.synchronization." + hc['type']
+                        importlib.import_module(libname)
+                        checker = HCSchemaChecker.instantiate(protocol=hc['type'])
+                        checker.perform_check(hc)
+                except SchemaError as e:
+                    context = "[SchemaCheck] ERROR in 'health_check' section of node %r[%d]: " % (realnodename, nodeindex)
+                    raise SchemaError(e.msg, context)
