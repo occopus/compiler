@@ -8,7 +8,6 @@ import importlib
 class SchemaChecker(object):
     @staticmethod
     def check_infra_desc(infra_desc):
-        print infra_desc
         keys = infra_desc.keys()
         if 'user_id' not in keys:
             print "[SchemaCheck] WARNING: user_id is not defined in infrastructure description"
