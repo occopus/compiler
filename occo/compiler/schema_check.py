@@ -27,12 +27,12 @@ class SchemaChecker(object):
             else:
                 for key in node['scaling']:
                     if key not in ['min', 'max']:
-                        raise SchemaError("[SchemaCheck] ERROR: invalid key \"%r\" in scaling of node %r" % (key, node['name']))
+                        raise SchemaError("[SchemaCheck] ERROR: unknown key \"%r\" in scaling of node %r" % (key, node['name']))
             if 'filter' in nodekeys and not isinstance(node['filter'], dict):
-                raise SchemaError("[SchemaCheck] ERROR: invalid type of filter in node %r - has to be dict" % node['name'])
+                raise SchemaError("[SchemaCheck] ERROR: unknown type of filter in node %r - has to be a dict!" % node['name'])
             for key in nodekeys:
                 if key not in ['name', 'type', 'scaling', 'filter', 'variables']:
-                    raise SchemaError("[SchemaCheck] ERROR: invalid key \"%r\" in node %r" % (key, node['name']))
+                    raise SchemaError("[SchemaCheck] ERROR: unknown key \"%r\" in node %r" % (key, node['name']))
         if 'dependencies' not in keys:
             print "[SchemaCheck] WARNING: no dependencies specified - using sequential ordering"
         else:
@@ -43,7 +43,7 @@ class SchemaChecker(object):
                         raise SchemaError("[SchemaCheck] ERROR: undefined connection ")
         for key in keys:
             if key not in ['user_id', 'infra_name', 'nodes', 'dependencies', 'variables']:
-                raise SchemaError("[SchemaCheck] ERROR: invalid key %r in infastructure description" % key)
+                raise SchemaError("[SchemaCheck] ERROR: unknown key %r in infastructure description" % key)
     
     @staticmethod
     def check_node_def(node_defs):
