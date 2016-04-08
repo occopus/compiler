@@ -58,7 +58,7 @@ import yaml
 import uuid
 import occo.util as util
 from occo.exceptions import SchemaError
-
+from schema_check import SchemaChecker
 def altcall(target, data):
     """
     Allows alternative calling of a function/method.
@@ -221,7 +221,8 @@ class StaticDescription(object):
         StaticDescription.schema_check(desc)
 
         self.infra_id = str(uuid.uuid4())
-        self.name = desc['name']
+        self.name = desc.get('infra_name',"undefined")
+        self.user_id = desc.get('user_id',"undefined")
         self.nodes = desc['nodes']
 
         self.node_lookup = dict((n['name'], n) for n in self.nodes)
@@ -230,7 +231,6 @@ class StaticDescription(object):
         self.topological_order = \
             StaticDescription.topo_order(self.nodes, self.edges)
         self.prepare_nodes(desc)
-        self.user_id = desc.get('user_id')
         self.variables = desc.get('variables', dict())
         self.suspended = desc.get('init_suspended', False)
         self.userinfo_strategy = desc.get('userinfo_strategy')
@@ -289,7 +289,11 @@ class StaticDescription(object):
 
         .. todo:: implement schema checking.
         """
-        pass
+        try:
+            SchemaChecker.check_infra_desc(infrastructure_description)
+        except SchemaError as e:
+            print e.msg
+            raise SchemaError(e.msg)
 
     @staticmethod
     def topo_order(all_nodes, all_edges):
