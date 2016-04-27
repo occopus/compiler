@@ -47,11 +47,11 @@ class SchemaChecker(object):
     @staticmethod
     def check_node_def(node_defs):
         for nodename, node_def in node_defs.iteritems():
-            realnodename = nodename.split(':')[1]
-            if nodename.split(':')[0] != 'node_def':
-                context = "[SchemaCheck] ERROR in node %r: " % realnodename
+            if ':' not in nodename or nodename.split(':', 1)[0] != 'node_def':
+                context = "[SchemaCheck] ERROR in node %r: " % nodename
                 msg = "Node definition must begin with 'node_def:<nodename>'!"
                 raise SchemaError(msg, context)
+            realnodename = nodename.split(':', 1)[1]
             if type(node_def) != list:
                 context = "[SchemaCheck] ERROR in node %r: " % realnodename
                 msg = "Node definition has to be a list of dictionaries!"
