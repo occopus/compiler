@@ -212,7 +212,7 @@ class StaticDescription(object):
 
     .. todo:: The ``infra_id`` may be predefined?
     """
-    def __init__(self, infrastructure_description):
+    def __init__(self, infrastructure_description, infra_id=None):
         # Deserialize description if necessary
         desc = infrastructure_description \
             if type(infrastructure_description) is dict \
@@ -220,7 +220,10 @@ class StaticDescription(object):
 
         StaticDescription.schema_check(desc)
 
-        self.infra_id = str(uuid.uuid4())
+        if infra_id:
+            self.infra_id = infra_id
+        else:    
+            self.infra_id = str(uuid.uuid4())
         self.name = desc.get('infra_name',"undefined")
         self.user_id = desc.get('user_id',"undefined")
         self.nodes = desc['nodes']
