@@ -256,6 +256,7 @@ class StaticDescription(object):
 
         for i in self.nodes:
             i['infra_id'] = self.infra_id # Foreign key, if you like
+            i['infra_name'] = desc['infra_name']
 
             # Variables inherited from the infrastructure
             # Variables specified in the node description are preferred

@@ -1,3 +1,7 @@
+
+v1.3 - January 2017
+- Make infra_name key visible for plugins
+
 v1.2 - August 2016
 - No changes (rerelase to refresh version number)
 
