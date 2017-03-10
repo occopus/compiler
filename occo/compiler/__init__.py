@@ -54,7 +54,7 @@ The compiler may provide other services in the future, for example:
 
 __all__ = ['StaticDescription', 'SchemaError']
 
-import yaml
+from ruamel import yaml
 import uuid
 import occo.util as util
 from occo.exceptions import SchemaError
@@ -216,7 +216,7 @@ class StaticDescription(object):
         # Deserialize description if necessary
         desc = infrastructure_description \
             if type(infrastructure_description) is dict \
-            else yaml.load(infrastructure_description)
+            else yaml.load(infrastructure_description,Loader=yaml.Loader)
 
         StaticDescription.schema_check(desc)
 

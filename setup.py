@@ -34,7 +34,8 @@ setuptools.setup(
     install_requires=[
         'argparse',
         'python-dateutil',
-        'PyYAML',
+        'ruamel.yaml',
+        'ruamel.ordereddict',
         'OCCO-Util',
     ],
 )
