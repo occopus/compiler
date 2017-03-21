@@ -5,16 +5,20 @@ from occo.infraprocessor.node_resolution import ContextSchemaChecker
 from occo.infraprocessor.synchronization import HCSchemaChecker
 import importlib
 
+
 class SchemaChecker(object):
     @staticmethod
     def check_infra_desc(infra_desc):
+        import logging
+        log = logging.getLogger('occo')
+
         keys = infra_desc.keys()
         if 'user_id' not in keys:
-            print "[SchemaCheck] WARNING: user_id is not defined in infrastructure description"
+            log.warning("[SchemaCheck] WARNING: user_id is not defined in infrastructure description")
         if 'infra_name' not in keys:
-            print "[SchemaCheck] WARNING: infra_name is not defined in infrastructure description"
+            raise SchemaError("[SchemaCheck] ERROR: infra_name must be defined in infrastructure description")
         if 'nodes' not in keys:
-            raise SchemaError("[SchemaCheck] ERROR: \"nodes\" must be defined in infrastructure description")
+            raise SchemaError("[SchemaCheck] ERROR: nodes section must be defined in infrastructure description")
         for node in infra_desc['nodes']:
             nodekeys = node.keys()
             if 'name' not in nodekeys:
@@ -22,7 +26,7 @@ class SchemaChecker(object):
             if 'type' not in nodekeys:
                 raise SchemaError("[SchemaCheck] ERROR: missing key \"type\" in node %r" % node['name'])
             if 'scaling' not in nodekeys:
-                print "[SchemaCheck] WARNING: missing \"scaling\" parameter in node %r, using default scaling (single instance)" % node['name']
+                log.warning("[SchemaCheck] WARNING: missing \"scaling\" parameter in node %r, using default scaling (single instance)",node['name'])
             else:
                 for key in node['scaling']:
                     if key not in ['min', 'max']:
@@ -33,7 +37,7 @@ class SchemaChecker(object):
                 if key not in ['name', 'type', 'scaling', 'filter', 'variables']:
                     raise SchemaError("[SchemaCheck] ERROR: unknown key \"%r\" in node %r" % (key, node['name']))
         if 'dependencies' not in keys:
-            print "[SchemaCheck] WARNING: no dependencies specified - using sequential ordering"
+            log.warning("[SchemaCheck] WARNING: no dependencies specified - using sequential ordering")
         else:
             for dep in infra_desc['dependencies']:
                 if isinstance(dep, dict):
