@@ -1,3 +1,6 @@
+v1.5 - May 2017
+- Add infra and node name syntax checking
+
 v1.4 - March 2017
 - New yaml reader: ruamel
 - Fixes in schema checker: logging and eval
