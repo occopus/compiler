@@ -5,6 +5,16 @@ from occo.infraprocessor.node_resolution import ContextSchemaChecker
 from occo.infraprocessor.synchronization import HCSchemaChecker
 import importlib
 
+import re
+def is_valid_hostname(hostname):
+    if "." in hostname:
+        return "cannot contain \'.\' character"
+    if len(hostname) > 64:
+        return "is too long"
+    allowed = re.compile(r"[a-z0-9-]{1,63}$", re.IGNORECASE)
+    if not allowed.match(hostname):
+        return "may contain only [a-z,0-9,-] characters"
+    return None
 
 class SchemaChecker(object):
     @staticmethod
@@ -17,12 +27,18 @@ class SchemaChecker(object):
             log.warning("[SchemaCheck] WARNING: user_id is not defined in infrastructure description")
         if 'infra_name' not in keys:
             raise SchemaError("[SchemaCheck] ERROR: infra_name must be defined in infrastructure description")
+        error = is_valid_hostname(infra_desc['infra_name'])
+        if error:
+            raise SchemaError("[SchemaCheck] ERROR: infra_name \"{0}\" {1}".format(infra_desc['infra_name'],str(error)))
         if 'nodes' not in keys:
             raise SchemaError("[SchemaCheck] ERROR: nodes section must be defined in infrastructure description")
         for node in infra_desc['nodes']:
             nodekeys = node.keys()
             if 'name' not in nodekeys:
                 raise SchemaError("[SchemaCheck] ERROR: missing key \"name\" in node")
+            error = is_valid_hostname(node['name'])
+            if error:
+                raise SchemaError("[SchemaCheck] ERROR: node \"{0}\" {1}".format(node['name'],str(error)))
             if 'type' not in nodekeys:
                 raise SchemaError("[SchemaCheck] ERROR: missing key \"type\" in node %r" % node['name'])
             if 'scaling' not in nodekeys:
