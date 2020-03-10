@@ -34,7 +34,6 @@ setuptools.setup(
         'argparse',
         'python-dateutil',
         'ruamel.yaml',
-        'ruamel.ordereddict',
         'OCCO-Util',
     ],
 )
