@@ -1,4 +1,4 @@
 argparse==1.2.1
 python-dateutil==2.2
-PyYAML==3.11
+PyYAML==4.2b1
 OCCO-Util==0.2.0

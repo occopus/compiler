@@ -10,7 +10,7 @@ nose-cov==1.6
 pika==0.9.14
 python-dateutil==2.2
 pytz==2014.9
-requests==2.4.3
+requests==2.20.0
 ruamel.yaml
 six==1.8.0
 
