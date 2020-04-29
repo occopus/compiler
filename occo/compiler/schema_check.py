@@ -22,7 +22,7 @@ class SchemaChecker(object):
         import logging
         log = logging.getLogger('occo')
 
-        keys = infra_desc.keys()
+        keys = list(infra_desc.keys())
         if 'user_id' not in keys:
             log.warning("[SchemaCheck] WARNING: user_id is not defined in infrastructure description")
         if 'infra_name' not in keys:
@@ -33,7 +33,7 @@ class SchemaChecker(object):
         if 'nodes' not in keys:
             raise SchemaError("[SchemaCheck] ERROR: nodes section must be defined in infrastructure description")
         for node in infra_desc['nodes']:
-            nodekeys = node.keys()
+            nodekeys = list(node.keys())
             if 'name' not in nodekeys:
                 raise SchemaError("[SchemaCheck] ERROR: missing key \"name\" in node")
             error = is_valid_hostname(node['name'])
@@ -57,7 +57,7 @@ class SchemaChecker(object):
         else:
             for dep in infra_desc['dependencies']:
                 if isinstance(dep, dict):
-                    depkeys = dep.keys()
+                    depkeys = list(dep.keys())
                     if 'connection' not in depkeys:
                         raise SchemaError("[SchemaCheck] ERROR: undefined connection ")
         for key in keys:
@@ -66,7 +66,7 @@ class SchemaChecker(object):
     
     @staticmethod
     def check_node_def(node_defs):
-        for nodename, node_def in node_defs.iteritems():
+        for nodename, node_def in list(node_defs.items()):
             if ':' not in nodename or nodename.split(':', 1)[0] != 'node_def':
                 context = "[SchemaCheck] ERROR in node %r: " % nodename
                 msg = "Node definition must begin with 'node_def:<nodename>'!"
